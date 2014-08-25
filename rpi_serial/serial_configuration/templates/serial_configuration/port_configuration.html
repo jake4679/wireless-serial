@@ -1,0 +1,17 @@
+{% block content %}
+<table>
+<form method="post" action="">
+    {{ serial_ports.management_form }}
+    {% for form in serial_ports %}
+    <tr>
+    {% for field in form.visible_fields %}
+        <td>{{ field.label_tag }} {{ field }}</td>
+    {% endfor %}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    </tr>
+    {% endfor %}
+</form>
+</table>
+{% endblock %}
