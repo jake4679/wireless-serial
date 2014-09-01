@@ -1,3 +1,4 @@
+import os
 from django.db import models
 
 # Create your models here.
@@ -32,7 +33,35 @@ class SerialPort(models.Model):
     # True if local file logging is enabled, default is False
     enable_file = models.BooleanField(default=False)
 
+    # Options related to the running process
+
+    # Process identifier for the serial port monitoring daemon
+    pid = models.IntegerField(default=-1)
+
     def __unicode__(self):
         return self.device_file
 
-#socat -d -d -ly tcp4-listen:54321,reuseaddr,fork file:/dev/ttyUSB0,nonblock,waitlock=/var/run/ttyUSB0.lock,b115200,raw,echo=0 &
+    def device(self):
+        return os.path.basename(self.device_file)
+
+    def socat_options(self):
+        # Sample options string below
+        #     -d -d -ly tcp4-listen:54321,reuseaddr,fork file:/dev/ttyUSB0,nonblock,waitlock=/var/run/ttyUSB0.lock,b115200,raw,echo=0 &
+        str = "-d -d -ly "
+        if self.enable_tcp:
+            str += 'tcp4-listen:%s,reuseaddr,fork' % self.port
+        str += ' file:%s' % self.device_file
+        if self.block_mode:
+            str += ',block'
+        else:
+            str += ',nonblock'
+        if self.lock_file:
+            str += ',waitlock=/var/run/%s.lock' % self.device()
+        str += ',b%s' % self.baud
+        if self.raw_mode:
+            str += ',raw'
+        if self.echo_mode:
+            str += ',echo=1'
+        else:
+            str += ',echo=0'
+        return str

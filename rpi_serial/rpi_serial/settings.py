@@ -52,6 +52,7 @@ ROOT_URLCONF = 'rpi_serial.urls'
 
 WSGI_APPLICATION = 'rpi_serial.wsgi.application'
 
+SERIAL_DAEMON_LOCK_FILE = 'rpi_serial_daemon.lock'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
